@@ -2,23 +2,28 @@ from pynput.keyboard import Key, Controller
 import time
 import datetime
 import threading
+import requests
+import json
 
 print()
 print('-----------------------------------------------------------------------------------------------------')
 print()
 
 keyboard = Controller()
-adv = int(input('Which adventure did you want to idle? '))
 boosters = input('Do you have boosters enabled? Y/N ').upper()
+adv = int(input('Which adventure did you want to idle? '))
 leng = adv * 3600
-
+channelid = input('Input Channel ID for discord: ')
 if boosters == 'Y':
     leng = leng/2
-
 convert = datetime.timedelta(seconds=leng)
-counter = 0
-
 def adventure():
+    global adv
+    msg= []
+    counter = 0
+    headers = {
+        'authorization': 'MzM0NDM2MDAxNjcyMDY5MTIy.GyOGK9.-SoDajcZ4IJAEeh1cC-P1wxn57lKlouluKrfps'
+    }
     while True:
         time.sleep(5)
         keyboard.type('@Idl')
@@ -42,6 +47,19 @@ def adventure():
         keyboard.press(Key.enter)
         keyboard.release(Key.enter)
         counter = counter+1
+        time.sleep(2)
+        r = requests.get(f'https://discord.com/api/v9/channels/{channelid}/messages', headers=headers)
+        info = json.loads(r.text)
+        for value in info:
+            msg.append(value['content'])
+        check = msg[0]
+        lvl = 'You reached a new level:'
+        print(check)
+        if lvl in check:
+            adv = adv+1
+            print(f'You leveled up! advancing to adventure {adv}!')
+        else:
+            pass
         print(f'Adventure {adv} Complete!')
         print(f'You have completed {counter} adventure(s) this session!')
 
