@@ -4,16 +4,45 @@ import datetime
 import threading
 import requests
 import json
+import getpass
+import os
 
 print()
 print('-----------------------------------------------------------------------------------------------------')
 print()
 
+
+
+user = getpass.getuser()
+path = (f'C:/Users/{user}/autoadventure')
+if os.path.exists(path) == True:
+    pass
+else:
+    os.mkdir(path)
 keyboard = Controller()
 boosters = input('Do you have boosters enabled? Y/N ').upper()
 adv = int(input('Which adventure did you want to idle? '))
 leng = adv * 3600
-channelid = input('Input Channel ID for discord: ')
+chng = input('Are you using a different channel than last use? Y/N: ').upper()
+if chng == 'Y':
+    channelid = input('Input Channel ID for discord: ')
+    f = open(f'C:/Users/{user}/autoadventure/channelid.txt', 'w+')
+    f.write(f'{channelid}')
+    f.close()
+else:
+    f = open(f'C:/Users/{user}/autoadventure/channelid.txt', 'r+')
+    channelid = f.read()
+    f.close()
+auth = input('Has your authorization key changed? Y/N: ').upper()
+if auth == 'Y':
+    f = open(f'C:/Users/{user}/autoadventure/authkey.txt', 'w+')
+    authcode = input('Please enter your authorization key: ')
+    f.write(f'{authcode}')
+    f.close()
+else:
+    f = open(f'C:/Users/{user}/autoadventure/authkey.txt', 'r+')
+    authcode = f.read()
+    f.close()
 if boosters == 'Y':
     leng = leng/2
 convert = datetime.timedelta(seconds=leng)
@@ -22,7 +51,7 @@ def adventure():
     msg= []
     counter = 0
     headers = {
-        'authorization': 'MzM0NDM2MDAxNjcyMDY5MTIy.GyOGK9.-SoDajcZ4IJAEeh1cC-P1wxn57lKlouluKrfps'
+        'authorization': f'{authcode}'
     }
     while True:
         time.sleep(5)
@@ -54,12 +83,9 @@ def adventure():
             msg.append(value['content'])
         check = msg[0]
         lvl = 'You reached a new level:'
-        print(check)
         if lvl in check:
             adv = adv+1
             print(f'You leveled up! advancing to adventure {adv}!')
-        else:
-            pass
         print(f'Adventure {adv} Complete!')
         print(f'You have completed {counter} adventure(s) this session!')
 
@@ -75,8 +101,8 @@ def pray():
         time.sleep(0.2)
         keyboard.press(Key.enter)
         keyboard.release(Key.enter)
-        print(f'Pray attempted, will try again in 1 hour')
-        time.sleep(3600)
+        print(f'Pray attempted, will try again in 5 hours')
+        time.sleep(18000)
 
 def steal():
     while True:
